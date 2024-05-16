@@ -3,99 +3,52 @@ using Microsoft.AspNetCore.Http;
 using Web.Ej4;
 
 namespace Web.Controllers
-{
-    [Route("api/[controller]")]
+{ 
     [ApiController]
+    [Route("api/[controller]")]
+
     public class Ej4Controller : ControllerBase
     {
-        static List<Personaje> listaPersonajes = new List<Personaje>();
-        static List<Enemigo> listaEnemigos = new List<Enemigo>();
+        public static List<Character> charactersList = new List<Character>();
 
         [HttpPost("[action]")]
-        public ActionResult CreatePersonajeFuerza([FromBody] PersonajeDeFuerza personajeDeFuerza)
+        public ActionResult CreateStrCharacter([FromBody] StrCharacter strCharacter)
         {
-            listaPersonajes.Add(personajeDeFuerza);
-            return CreatedAtAction(nameof(CreatePersonajeFuerza), personajeDeFuerza);
-        }
-
-
-        [HttpPost("[action]")]
-        public ActionResult CreatePersonajeAgilidad([FromBody] PersonajeDeAgilidad personajeDeAgilidad)
-        {
-            listaPersonajes.Add(personajeDeAgilidad);
-            return CreatedAtAction(nameof(CreatePersonajeAgilidad), personajeDeAgilidad);
+            charactersList.Add(strCharacter);
+            return Ok(charactersList);
         }
 
         [HttpPost("[action]")]
-        public ActionResult CreatePersonajeMagia([FromBody] PersonajeDeMagia personajeDeMagia)
+        public ActionResult CreateAgiCharacter([FromBody] AgiCharacter agiCharacter)
         {
-            listaPersonajes.Add(personajeDeMagia);
-            return CreatedAtAction(nameof(CreatePersonajeMagia), personajeDeMagia);
+            charactersList.Add(agiCharacter);
+            return Ok(charactersList);
         }
 
         [HttpPost("[action]")]
-        public ActionResult CreateEnemigo([FromBody] Enemigo enemigo)
+        public ActionResult CreateMagicCharacter([FromBody] MagicCharacter magicCharacter)
         {
-            listaEnemigos.Add(enemigo);
-            return CreatedAtAction(nameof(CreateEnemigo), enemigo);
-
+            charactersList.Add(magicCharacter);
+            return Ok(charactersList);
         }
 
         [HttpGet("[action]")]
-        public ActionResult<List<string>> GetBatalla()
+        public ActionResult<string> MoveCharacter([FromBody] string name) 
         {
-            List<string> resultadosAtaques = Turno.Atacarse(listaPersonajes);
-
-            Enemigo enemigo = listaEnemigos[0]; // agarro un solo enemigo (el de la lista)
-            float dañoTotalPersonajes = 0;
-
-            
-            foreach (var personaje in listaPersonajes)
+            Character character = charactersList.Find(c => c.Name == name);
+            if (character != null )
             {
-                float daño = personaje.CalcularDanio();
-                dañoTotalPersonajes += daño;
+                return character.MoveXAxis() + character.MoveYAxis();
             }
-            
-            enemigo.DañoRecibido(dañoTotalPersonajes); //aplico todo el daño al enemigo
-
-            if (enemigo.Vida <= 0)
+            else
             {
-                resultadosAtaques.Add($"El enemigo ha sido derrotado porque los personajes hicieron {dañoTotalPersonajes} de daño");
-                return resultadosAtaques; 
+                return NotFound();
             }
-
-            resultadosAtaques.Add($"Daño total de los personajes al enemigo: {dañoTotalPersonajes}. El enemigo quedo con {enemigo.Vida} de vida");
-            return resultadosAtaques;
         }
-
-
     }
 
 
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
